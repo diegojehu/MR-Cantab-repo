@@ -1,0 +1,127 @@
+---
+title: "Practical 1"
+author: "Diego Aguilar-Ramirez"
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+params: 
+  ROOTDIR: !r ROOTDIR <- "J:/Genetics/Training/2022_MR_Course_Cambridge/04_Practical-1/"
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ROOTDIR <- params$ROOTDIR
+"%&%" <- function(a,b) paste0(a,b)
+```
+
+**NOTE:**This script is largely based on material provided (see "00_Prelim_material" and "01_Practical-1") by course to set up R for MR analyses used in course.  
+
+# Updates R
+
+```{r, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE }
+if (!require("installr")) install.packages("installr")
+installr::updater()
+```
+
+# Installs packages required for course all throughout  
+
+```{r eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE }
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(ivpack, meta, MendelianRandomization)
+```
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(ivpack)
+```
+# Load the data  
+
+Data was downloaded from Moodle  
+**NOTE:** Rproj is at different wd (which is in version control). This Rmd file has a ROOTDIR set as a param from which data is called.  
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+coursedata = read.csv(ROOTDIR %&% "coursedata.csv") #Load data
+attach(coursedata) #Attach coursedata to the R search path 
+```
+
+# Explore the data
+```{r}
+str(coursedata)
+head(coursedata)
+```
+
+# 1. Causal estimate using the ratio method for a continuous outcome
+The causal effect of the risk factor `x` on the continuous outcome `y`can be estimated as the per allele genetic association with the outcome $\hat{\beta}_{Y_{j}}$ divided by the per allele genetic association with the risk factor $\hat{\beta}_{X_{j}}$ (the ratio method):
+$$ratio\ estimate\ for\ variant\ j = \frac{\hat{\beta}_{Y_{j}}}{\hat{\beta}_{X_{j}}}$$
+\vspace{6pt}
+
+```{r}
+by1 = lm(y~g1)$coef[2] #Genetic association with the outcome
+bx1 = lm(x~g1)$coef[2] #Genetic association with the exposure
+```
+So, simply divide `by1` by `bx1` to calculate the ratio
+
+```{r}
+beta.ratio = by1/bx1
+beta.ratio #Ratio estimate for g1
+```
+
+The standard error of the causal estimate can be calculated simply as the standard error of the genetic association with the outcome $se(\hat{\beta}_{Y_{j}})$ divided by the genetic association with the risk factor $\hat{\beta}_{X_{j}}$. This is the simplest form of the standard error, and is the first-order term from a delta method expansion for the standard error of a ratio (whatever this means, took verbatim from practical material).
+$$standard\ error\ of\ ratio\ estimate\ (first\ order) = \frac{se(\hat{\beta}_{Y_{j}})}{\hat{\beta}_{X_{j}}}$$
+\vspace{6pt}
+
+Practical asks to *"calculate the first order standard error of the ratio estimate for the first genetic variant <tt>`g1`</tt>."* This code should help:
+
+```{r, eval=TRUE}
+byse1 = summary(lm(y~g1))$coef[2,2] #Standard error of the G-Y association
+se.ratio1first = byse1/sqrt(bx1^2)  
+se.ratio1first #Standard error (first order) of the ratio estimate 
+```
+*Since the estimate of `bx1` is not guaranteed to be positive, we take the square, and then the square root of `bx1`, when calculating the first order standard error of the ratio estimate. The standard error will not make sense if `bx1` is negative.*
+
+The above approximation does not account for the uncertainty in the denominator of the ratio estimate. This can be taken into account using the second term of the delta method expansion:
+$$standard\ error\ of\ ratio\ estimate\ (second\ order) =  \sqrt{\frac{se(\hat{\beta}_{Y_{j}})^2}{{\hat{\beta}_{X_{j}}}^2} + \frac{{\hat{\beta}_{Y_{j}}}^2{se(\hat{\beta}_{X_{j}})}^2}{{\hat{\beta}_{X_{j}}}^4}} $$
+\vspace{6pt}
+Then calculate the second order standard error of the ratio estimate for the first genetic variant <tt>`g1`</tt>.
+\vspace{48pt}
+
+```{r, eval=TRUE}
+bxse1 = summary(lm(x~g1))$coef[2,2] #Standard error of the G-X association
+se.ratio1second = sqrt(byse1^2/bx1^2 + by1^2*bxse1^2/bx1^4)
+se.ratio1second #Standard error (second order) of the ratio estimate
+```
+
+The F-statistic from the regression of the risk factor on the genetic variant(s) is used as a measure of ‘weak instrument bias’, with smaller values suggesting that the estimate may suffer from weak instrument bias. Calculate the F-statistic for the first genetic variant `g1`.  
+
+```{r, eval=TRUE}
+fstat1 = summary(lm(x~g1))$f[1]
+fstat1
+```
+**NOTE:***Care should be taken when interpreting the F-statistic from observed data. Some studies recommend excluding genetic variants if they have a F-statistic less than 10. Using such a stringent cut-off may introduce more bias than it prevents, as the estimated F-statistic can show considerable variation and may not provide a good indication of the true stength of the instrument.*
+
+The Minor Allele Frequency (MAF) is the frequency at which the second most common allele occurs in a given population. Calculate the MAF for `g1`, remembering that some people may have 2 copies of the allele. *"Total up the total number of alleles in the population and divide by two times the size of the population"*
+
+
+```{r, eval=TRUE}
+MAF = (sum(g1==1) + 2*sum(g1==2))/(2*length(g1))
+MAF
+```
+
+Read in `summarized_data.csv` to obtain the values that have been calculated (for the course) for the other 3 genetic variants.
+
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
+ratio.all<-as.matrix(read.csv(ROOTDIR %&% "summarized_data.csv", row=1)) 
+ratio.all
+```
+
+For the first order approximation, the most precise genetic variant (ie, that with the smallest standard error) is `g2`. Variants with stronger associations with the risk factor will have smaller standard errors for the ratio estimate. Variants with low MAF will generally have large standard errors for the ratio estimate.  
+
+There is little difference in the standard errors for the first and second order approximations for `g1` and `g2`. The second order approximations are noticeably larger than the first order approximations for `g3` and `g4`. The first and second order standard errors differ the most when the genetic association with the risk factor is imprecise.  
+
+To compute the **observationa**association, regress `y` on `x`.
+
+```{r}
+lm(y~x)$coeff[2]
+```
+_The estimate for the observational association suggests there is an negative effect of the risk factor on the outcome. However the ratio estimates for <tt>`g2`</tt>, <tt>`g3`</tt> and <tt>`g4`</tt> indicated a positive effect._
+
+###

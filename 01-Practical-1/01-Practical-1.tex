@@ -1,0 +1,340 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Practical 1},
+  pdfauthor={Diego Aguilar-Ramirez},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Practical 1}
+\author{Diego Aguilar-Ramirez}
+\date{2022-03-14}
+
+\begin{document}
+\maketitle
+
+\textbf{NOTE:}This script is largely based on material provided (see
+``00\_Prelim\_material'' and 01) by course to set up R for MR analyses
+used in course.
+
+\hypertarget{updates-r}{%
+\section{Updates R}\label{updates-r}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\SpecialCharTok{!}\FunctionTok{require}\NormalTok{(}\StringTok{"installr"}\NormalTok{)) }\FunctionTok{install.packages}\NormalTok{(}\StringTok{"installr"}\NormalTok{)}
+\NormalTok{installr}\SpecialCharTok{::}\FunctionTok{updater}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{installs-packages-required-for-course-all-throughout}{%
+\section{Installs packages required for course all
+throughout}\label{installs-packages-required-for-course-all-throughout}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\SpecialCharTok{!}\FunctionTok{require}\NormalTok{(}\StringTok{"pacman"}\NormalTok{)) }\FunctionTok{install.packages}\NormalTok{(}\StringTok{"pacman"}\NormalTok{)}
+\NormalTok{pacman}\SpecialCharTok{::}\FunctionTok{p\_load}\NormalTok{(ivpack, meta, MendelianRandomization)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{load-the-data}{%
+\section{Load the data}\label{load-the-data}}
+
+Data was downloaded from Moodle\\
+\textbf{NOTE:} Although Rproj is at different wd (which is in version
+control), I will set the wd to the directory where I downloaded the data
+(which is not in version control) - might change later on.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{coursedata }\OtherTok{=} \FunctionTok{read.csv}\NormalTok{(ROOTDIR }\SpecialCharTok{\%\&\%} \StringTok{"coursedata.csv"}\NormalTok{) }\CommentTok{\#Load data}
+\FunctionTok{attach}\NormalTok{(coursedata) }\CommentTok{\#Attach coursedata to the R search path }
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{explore-the-data}{%
+\section{Explore the data}\label{explore-the-data}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(coursedata)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    1000 obs. of  8 variables:
+##  $ ID   : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ g1   : int  1 0 1 0 0 2 1 1 1 2 ...
+##  $ g2   : int  0 0 1 0 0 0 0 0 0 0 ...
+##  $ g3   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ g4   : int  1 0 1 0 1 0 0 0 0 0 ...
+##  $ x    : num  0.5114 -1.0545 -0.563 0.8615 0.0156 ...
+##  $ y    : num  -1.297 0.912 1.279 -1.438 2.719 ...
+##  $ y.bin: int  1 0 0 1 0 0 1 1 0 0 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(coursedata)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID g1 g2 g3 g4           x          y y.bin
+## 1  1  1  0  0  1  0.51141400 -1.2970720     1
+## 2  2  0  0  0  0 -1.05450500  0.9117613     0
+## 3  3  1  1  0  1 -0.56296820  1.2791060     0
+## 4  4  0  0  0  0  0.86149410 -1.4378610     1
+## 5  5  0  0  0  1  0.01561589  2.7192830     0
+## 6  6  2  0  0  0  0.68330030  1.6415770     0
+\end{verbatim}
+
+\hypertarget{causal-estimate-using-the-ratio-method-for-a-continuous-outcome}{%
+\section{1. Causal estimate using the ratio method for a continuous
+outcome}\label{causal-estimate-using-the-ratio-method-for-a-continuous-outcome}}
+
+The causal effect of the risk factor \texttt{x} on the continuous
+outcome \texttt{y}can be estimated as the per allele genetic association
+with the outcome \(\hat{\beta}_{Y_{j}}\) divided by the per allele
+genetic association with the risk factor \(\hat{\beta}_{X_{j}}\) (the
+ratio method):
+\[ratio\ estimate\ for\ variant\ j = \frac{\hat{\beta}_{Y_{j}}}{\hat{\beta}_{X_{j}}}\]
+\vspace{6pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{by1 }\OtherTok{=} \FunctionTok{lm}\NormalTok{(y}\SpecialCharTok{\textasciitilde{}}\NormalTok{g1)}\SpecialCharTok{$}\NormalTok{coef[}\DecValTok{2}\NormalTok{] }\CommentTok{\#Genetic association with the outcome}
+\NormalTok{bx1 }\OtherTok{=} \FunctionTok{lm}\NormalTok{(x}\SpecialCharTok{\textasciitilde{}}\NormalTok{g1)}\SpecialCharTok{$}\NormalTok{coef[}\DecValTok{2}\NormalTok{] }\CommentTok{\#Genetic association with the exposure}
+\end{Highlighting}
+\end{Shaded}
+
+So, simply divide \texttt{by1} by \texttt{bx1} to calculate the ratio
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{beta.ratio }\OtherTok{=}\NormalTok{ by1}\SpecialCharTok{/}\NormalTok{bx1}
+\NormalTok{beta.ratio }\CommentTok{\#Ratio estimate for g1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          g1 
+## -0.06302634
+\end{verbatim}
+
+The standard error of the causal estimate can be calculated simply as
+the standard error of the genetic association with the outcome
+\(se(\hat{\beta}_{Y_{j}})\) divided by the genetic association with the
+risk factor \(\hat{\beta}_{X_{j}}\). This is the simplest form of the
+standard error, and is the first-order term from a delta method
+expansion for the standard error of a ratio (whatever this means, took
+verbatim from practical material).
+\[standard\ error\ of\ ratio\ estimate\ (first\ order) = \frac{se(\hat{\beta}_{Y_{j}})}{\hat{\beta}_{X_{j}}}\]
+\vspace{6pt}
+
+Practical asks to \emph{``calculate the first order standard error of
+the ratio estimate for the first genetic variant \texttt{g1}.''} This
+code should help:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{byse1 }\OtherTok{=} \FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(y}\SpecialCharTok{\textasciitilde{}}\NormalTok{g1))}\SpecialCharTok{$}\NormalTok{coef[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{] }\CommentTok{\#Standard error of the G{-}Y association}
+\NormalTok{se.ratio1first }\OtherTok{=}\NormalTok{ byse1}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(bx1}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)  }
+\NormalTok{se.ratio1first }\CommentTok{\#Standard error (first order) of the ratio estimate }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        g1 
+## 0.6451987
+\end{verbatim}
+
+\emph{Since the estimate of \texttt{bx1} is not guaranteed to be
+positive, we take the square, and then the square root of \texttt{bx1},
+when calculating the first order standard error of the ratio estimate.
+The standard error will not make sense if \texttt{bx1} is negative.}
+
+The above approximation does not account for the uncertainty in the
+denominator of the ratio estimate. This can be taken into account using
+the second term of the delta method expansion:
+\[standard\ error\ of\ ratio\ estimate\ (second\ order) =  \sqrt{\frac{se(\hat{\beta}_{Y_{j}})^2}{{\hat{\beta}_{X_{j}}}^2} + \frac{{\hat{\beta}_{Y_{j}}}^2{se(\hat{\beta}_{X_{j}})}^2}{{\hat{\beta}_{X_{j}}}^4}} \]
+\vspace{6pt} Then calculate the second order standard error of the ratio
+estimate for the first genetic variant \texttt{g1}. \vspace{48pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bxse1 }\OtherTok{=} \FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(x}\SpecialCharTok{\textasciitilde{}}\NormalTok{g1))}\SpecialCharTok{$}\NormalTok{coef[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{] }\CommentTok{\#Standard error of the G{-}X association}
+\NormalTok{se.ratio1second }\OtherTok{=} \FunctionTok{sqrt}\NormalTok{(byse1}\SpecialCharTok{\^{}}\DecValTok{2}\SpecialCharTok{/}\NormalTok{bx1}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ by1}\SpecialCharTok{\^{}}\DecValTok{2}\SpecialCharTok{*}\NormalTok{bxse1}\SpecialCharTok{\^{}}\DecValTok{2}\SpecialCharTok{/}\NormalTok{bx1}\SpecialCharTok{\^{}}\DecValTok{4}\NormalTok{)}
+\NormalTok{se.ratio1second }\CommentTok{\#Standard error (second order) of the ratio estimate}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        g1 
+## 0.6459625
+\end{verbatim}
+
+The F-statistic from the regression of the risk factor on the genetic
+variant(s) is used as a measure of `weak instrument bias', with smaller
+values suggesting that the estimate may suffer from weak instrument
+bias. Calculate the F-statistic for the first genetic variant
+\texttt{g1}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fstat1 }\OtherTok{=} \FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(x}\SpecialCharTok{\textasciitilde{}}\NormalTok{g1))}\SpecialCharTok{$}\NormalTok{f[}\DecValTok{1}\NormalTok{]}
+\NormalTok{fstat1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    value 
+## 4.027979
+\end{verbatim}
+
+\textbf{NOTE:}\emph{Care should be taken when interpreting the
+F-statistic from observed data. Some studies recommend excluding genetic
+variants if they have a F-statistic less than 10. Using such a stringent
+cut-off may introduce more bias than it prevents, as the estimated
+F-statistic can show considerable variation and may not provide a good
+indication of the true stength of the instrument.}
+
+The Minor Allele Frequency (MAF) is the frequency at which the second
+most common allele occurs in a given population. Calculate the MAF for
+\texttt{g1}, remembering that some people may have 2 copies of the
+allele. \emph{``Total up the total number of alleles in the population
+and divide by two times the size of the population''}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MAF }\OtherTok{=}\NormalTok{ (}\FunctionTok{sum}\NormalTok{(g1}\SpecialCharTok{==}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+} \DecValTok{2}\SpecialCharTok{*}\FunctionTok{sum}\NormalTok{(g1}\SpecialCharTok{==}\DecValTok{2}\NormalTok{))}\SpecialCharTok{/}\NormalTok{(}\DecValTok{2}\SpecialCharTok{*}\FunctionTok{length}\NormalTok{(g1))}
+\NormalTok{MAF}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.3015
+\end{verbatim}
+
+Read in \texttt{summarized\_data.csv} to obtain the values that have
+been calculated (for the course) for the other 3 genetic variants.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ratio.all}\OtherTok{\textless{}{-}}\FunctionTok{as.matrix}\NormalTok{(}\FunctionTok{read.csv}\NormalTok{(ROOTDIR }\SpecialCharTok{\%\&\%} \StringTok{"summarized\_data.csv"}\NormalTok{, }\AttributeTok{row=}\DecValTok{1}\NormalTok{)) }
+\NormalTok{ratio.all}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                           g1         g2         g3         g4
+## by              -0.008550605  0.2565551  0.2778433 0.17188563
+## byse             0.087532274  0.1325076  0.1316129 0.12653807
+## bx               0.135667161  0.4938326  0.3475786 0.06788043
+## bxse             0.067597577  0.1015321  0.1014761 0.09798360
+## beta.ratio      -0.063026340  0.5195184  0.7993682 2.53218242
+## se.ratio.first   0.645198685  0.2683249  0.3786566 1.86413185
+## se.ratio.second  0.645962479  0.2888032  0.4447983 4.10305056
+## fstat            4.027979155 23.6566409 11.7321775 0.47993491
+## MAF              0.301500000  0.1010000  0.1030000 0.11150000
+\end{verbatim}
+
+\end{document}
