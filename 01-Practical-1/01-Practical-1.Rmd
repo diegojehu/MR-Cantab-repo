@@ -5,6 +5,11 @@ date: "`r format(Sys.Date())`"
 output:
   html_document:
     df_print: paged
+    theme: journal
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 2
   pdf_document: default
 params: 
   ROOTDIR: !r ROOTDIR <- "J:/Genetics/Training/2022_MR_Course_Cambridge/04_Practical-1/"
