@@ -17,14 +17,14 @@ ROOTDIR <- params$ROOTDIR
 
 **NOTE:**This script is largely based on material provided (see "00_Prelim_material" and "01_Practical-1") by course to set up R for MR analyses used in course.  
 
-# Updates R
+# Update R
 
 ```{r, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE }
 if (!require("installr")) install.packages("installr")
 installr::updater()
 ```
 
-# Installs packages required for course all throughout  
+# Install packages required for course all throughout  
 
 ```{r eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE }
 if (!require("pacman")) install.packages("pacman")
@@ -33,24 +33,28 @@ pacman::p_load(ivpack, meta, MendelianRandomization)
 ```{r message=FALSE, warning=FALSE, echo=FALSE}
 library(ivpack)
 ```
+
 # Load the data  
 
 Data was downloaded from Moodle  
 **NOTE:** Rproj is at different wd (which is in version control). This Rmd file has a ROOTDIR set as a param from which data is called.  
 
-```{r echo=TRUE, message=FALSE, warning=FALSE}
+```{r echo=TRUE}
 coursedata = read.csv(ROOTDIR %&% "coursedata.csv") #Load data
 attach(coursedata) #Attach coursedata to the R search path 
 ```
+**NOTE:** `attach(coursedata)` seems to be very useful to shorten scripts in R calling columns within `coursedata`. Instead of having to use `coursedata$g1` one simply has to use `g1` to call that column.
 
 # Explore the data
+
 ```{r}
 str(coursedata)
 head(coursedata)
 ```
 
-# 1. Causal estimate using the ratio method for a continuous outcome
-The causal effect of the risk factor `x` on the continuous outcome `y`can be estimated as the per allele genetic association with the outcome $\hat{\beta}_{Y_{j}}$ divided by the per allele genetic association with the risk factor $\hat{\beta}_{X_{j}}$ (the ratio method):
+# 1. Causal estimate using the ratio method for a continuous outcome  
+
+a) The causal effect of the risk factor `x` on the continuous outcome `y`can be estimated as the per allele genetic association with the outcome $\hat{\beta}_{Y_{j}}$ divided by the per allele genetic association with the risk factor $\hat{\beta}_{X_{j}}$ (the ratio method):
 $$ratio\ estimate\ for\ variant\ j = \frac{\hat{\beta}_{Y_{j}}}{\hat{\beta}_{X_{j}}}$$
 \vspace{6pt}
 
@@ -65,7 +69,7 @@ beta.ratio = by1/bx1
 beta.ratio #Ratio estimate for g1
 ```
 
-The standard error of the causal estimate can be calculated simply as the standard error of the genetic association with the outcome $se(\hat{\beta}_{Y_{j}})$ divided by the genetic association with the risk factor $\hat{\beta}_{X_{j}}$. This is the simplest form of the standard error, and is the first-order term from a delta method expansion for the standard error of a ratio (whatever this means, took verbatim from practical material).
+b) The standard error of the causal estimate can be calculated simply as the standard error of the genetic association with the outcome $se(\hat{\beta}_{Y_{j}})$ divided by the genetic association with the risk factor $\hat{\beta}_{X_{j}}$. This is the simplest form of the standard error, and is the first-order term from a delta method expansion for the standard error of a ratio (whatever this means, took verbatim from practical material).
 $$standard\ error\ of\ ratio\ estimate\ (first\ order) = \frac{se(\hat{\beta}_{Y_{j}})}{\hat{\beta}_{X_{j}}}$$
 \vspace{6pt}
 
@@ -78,10 +82,10 @@ se.ratio1first #Standard error (first order) of the ratio estimate
 ```
 *Since the estimate of `bx1` is not guaranteed to be positive, we take the square, and then the square root of `bx1`, when calculating the first order standard error of the ratio estimate. The standard error will not make sense if `bx1` is negative.*
 
-The above approximation does not account for the uncertainty in the denominator of the ratio estimate. This can be taken into account using the second term of the delta method expansion:
+c) The above approximation does not account for the uncertainty in the denominator of the ratio estimate. This can be taken into account using the second term of the delta method expansion:
 $$standard\ error\ of\ ratio\ estimate\ (second\ order) =  \sqrt{\frac{se(\hat{\beta}_{Y_{j}})^2}{{\hat{\beta}_{X_{j}}}^2} + \frac{{\hat{\beta}_{Y_{j}}}^2{se(\hat{\beta}_{X_{j}})}^2}{{\hat{\beta}_{X_{j}}}^4}} $$
-\vspace{6pt}
-Then calculate the second order standard error of the ratio estimate for the first genetic variant <tt>`g1`</tt>.
+\vspace{6pt} 
+Calculate the second order standard error of the ratio estimate for the first genetic variant <tt>`g1`</tt>.
 \vspace{48pt}
 
 ```{r, eval=TRUE}
@@ -90,7 +94,7 @@ se.ratio1second = sqrt(byse1^2/bx1^2 + by1^2*bxse1^2/bx1^4)
 se.ratio1second #Standard error (second order) of the ratio estimate
 ```
 
-The F-statistic from the regression of the risk factor on the genetic variant(s) is used as a measure of ‘weak instrument bias’, with smaller values suggesting that the estimate may suffer from weak instrument bias. Calculate the F-statistic for the first genetic variant `g1`.  
+d) The F-statistic from the regression of the risk factor on the genetic variant(s) is used as a measure of ‘weak instrument bias’, with smaller values suggesting that the estimate may suffer from weak instrument bias. Calculate the F-statistic for the first genetic variant `g1`.  
 
 ```{r, eval=TRUE}
 fstat1 = summary(lm(x~g1))$f[1]
@@ -98,7 +102,7 @@ fstat1
 ```
 **NOTE:***Care should be taken when interpreting the F-statistic from observed data. Some studies recommend excluding genetic variants if they have a F-statistic less than 10. Using such a stringent cut-off may introduce more bias than it prevents, as the estimated F-statistic can show considerable variation and may not provide a good indication of the true stength of the instrument.*
 
-The Minor Allele Frequency (MAF) is the frequency at which the second most common allele occurs in a given population. Calculate the MAF for `g1`, remembering that some people may have 2 copies of the allele. *"Total up the total number of alleles in the population and divide by two times the size of the population"*
+e) The Minor Allele Frequency (MAF) is the frequency at which the second most common allele occurs in a given population. Calculate the MAF for `g1`, remembering that some people may have 2 copies of the allele. *"Total up the total number of alleles in the population and divide by two times the size of the population"*
 
 
 ```{r, eval=TRUE}
@@ -106,6 +110,7 @@ MAF = (sum(g1==1) + 2*sum(g1==2))/(2*length(g1))
 MAF
 ```
 
+f) How does `g1` compare with the other genetic variants?
 Read in `summarized_data.csv` to obtain the values that have been calculated (for the course) for the other 3 genetic variants.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
@@ -113,11 +118,11 @@ ratio.all<-as.matrix(read.csv(ROOTDIR %&% "summarized_data.csv", row=1))
 ratio.all
 ```
 
-For the first order approximation, the most precise genetic variant (ie, that with the smallest standard error) is `g2`. Variants with stronger associations with the risk factor will have smaller standard errors for the ratio estimate. Variants with low MAF will generally have large standard errors for the ratio estimate.  
+*For the first order approximation, the most precise genetic variant (ie, that with the smallest standard error) is `g2`. Variants with stronger associations with the risk factor will have smaller standard errors for the ratio estimate. Variants with low MAF will generally have large standard errors for the ratio estimate.*  
 
-There is little difference in the standard errors for the first and second order approximations for `g1` and `g2`. The second order approximations are noticeably larger than the first order approximations for `g3` and `g4`. The first and second order standard errors differ the most when the genetic association with the risk factor is imprecise.  
+*There is little difference in the standard errors for the first and second order approximations for `g1` and `g2`. The second order approximations are noticeably larger than the first order approximations for `g3` and `g4`. The first and second order standard errors differ the most when the genetic association with the risk factor is imprecise.*  
 
-To compute the **observationa**association, regress `y` on `x`.
+To compute the **observational** association, regress `y` on `x`.
 
 ```{r}
 lm(y~x)$coeff[2]
@@ -125,3 +130,110 @@ lm(y~x)$coeff[2]
 _The estimate for the observational association suggests there is an negative effect of the risk factor on the outcome. However the ratio estimates for <tt>`g2`</tt>, <tt>`g3`</tt> and <tt>`g4`</tt> indicated a positive effect._
 
 ###
+
+# 2. Causal estimate using the two-stage least squares method for a continuous outcome
+
+The causal effect of the risk factor `x` on the continuous outcome `y` can also be estimated by the two-stage least squares (2SLS or TSLS) method. Two-stage least squares is performed by:
+- Regressing the risk factor on all the genetic variants in the same model and storing the fitted values of the risk factor (R code: `fitted.values=lm(x~g1+g2+g3+g4)$fitted`).
+- A regression is then performed with the outcome on the fitted values of the risk factor (R code: `lm(y~fitted.values)`)
+
+a) Perform the two-stage least squares method "by hand" (doing the regression stages yourself). Note the estimate and se of the second regression.
+
+```{r}
+fitted.values=lm(x~g1+g2+g3+g4)$fitted
+by.hand<-lm(y~fitted.values)
+```
+```{r}
+summary(by.hand)$coeff[2] #estimate
+```
+```{r}
+summary(by.hand)$coeff[2,2] #standard error
+```
+ b) Performing two-stage least squares by hand is discouraged as SE in 2nd stage of regression does not account for uncertainty in 1st stage regression. The R package performs the 2SLS method using the `ivreg` function:
+ 
+```{r}
+ivmodel.all = ivreg(y~x|g1+g2+g3+g4, x=TRUE)
+```
+```{r}
+summary(ivmodel.all)$coeff[2] #estimate
+```
+```{r}
+summary(ivmodel.all)$coeff[2,2] #standard error
+```
+_Estimates are the same, but standard error is slightly larger when using `ivreg` function, as it takes into account the uncertainty in 1st-stage regression_  
+
+c) What is the F statistic for the model with all the genetic variants?  
+
+```{r}
+summary(lm(x~g1+g2+g3+g4))$f[1] #f-stat
+```
+
+d) Perform the 2SLS method based only on the first genetic variant `g1`  
+
+```{r}
+ivmodel.g1 = ivreg(y~x|g1, x=TRUE)
+summary(ivmodel.g1)$coef[2] #2SLS estimate for g1 only 
+```
+
+```{r}
+summary(ivmodel.g1)$coef[2,2] #Standard error of the 2SLS estimate for g
+```
+
+_The estimates from the 2SLS method and the ratio method are the same and the standard errors from the two approaches are very similar._
+
+###
+
+# 3. Causal estimate for a binary outcome  
+The causal effect of the risk factor `x` on the binary outcome `y.bin` can also be estimated as the per allele genetic association with the outcome divided by the per allele association with the risk factor. However, with a binary outcome, logistic regression should be used for regression of the outcome on the genetic variant, particularly in a case-control setting. Also, in a case control setting, it is usual to regress the risk factor on the genetic variant *in controls only*. The `glm` function with an extra argument of `family=binomial` can be used to perform logistic regression in the same way that `lm` is used to perform linear regression.  
+
+a) Evaluate the ratio estimate and its SE for `g1` using logistic regression (R code: `glm(y.bin~g1, family=binomial)`) to calculate the numerator (gene-outcome association), and linear regression in controls only (R code: `lm(x[ybin==0]~g1[y.bin==0])`) to calculate the denominator.
+```{r}
+by1.bin <- glm(y.bin~g1, family=binomial)$coef[2] #numerator with log reg, ie gene-outcome association
+byse1.bin <- summary(glm(y.bin~g1, family=binomial))$coef[2,2] #standard error
+```
+```{r}
+bx1.bin <- lm(x[y.bin==0]~g1[y.bin==0])$coef[2] #denominator with lin reg only in controls, ie gene exposure association
+beta.ratio1.bin <- by1.bin/bx1.bin
+beta.ratio1.bin # ratio estimate for g1
+```
+```{r}
+se.ratio1.bin <- byse1.bin/sqrt(bx1.bin^2) #standard error of the ratio estimate for g1 (changed script form course material to square and then sqrt)
+se.ratio1.bin
+```
+b) Calculate the 2SLS estimate for `g1` only. Recall we first regress the risk factor on the genetic variant - however in the binary case, we want to perform this regression on the controls only. Then find fitted values for the model. Cases will still need a fitted value of the risk factor - this van be obtained by either using the `predict` function or by using the coefficients estimated in the first stage and calculating fitted values manually. Finally, we regress the binary outcome on thes fitted values using logistic regression.  
+
+```{r}
+g1.con = g1[y.bin==0] #values for g1 in the controls only 
+x.con  = x[y.bin==0] #values for the risk factor in the controls only
+
+#Generate predicted values for all participants based on the linear regression in the controls only.
+predict.con.g1 = predict(lm(x.con~g1.con), newdata=list(g1.con=g1)) 
+
+#Fit a logistic regression model on all the participants
+tsls1.con = glm(y.bin~predict.con.g1, family=binomial)
+```
+Print results:
+```{r}
+summary(tsls1.con)$coef[2]
+summary(tsls1.con)$coef[2,2]
+```
+c) Then repeat _b)_ byt for all genetic variants.
+```{r}
+g2.con = g2[y.bin ==0] #values for g2 in the controls only 
+g3.con = g3[y.bin ==0] #values for g3 in the controls only 
+g4.con = g4[y.bin ==0] #values for g4 in the controls only 
+predict.con<-predict(lm(x.con~g1.con+g2.con+g3.con+g4.con), #Predicted values 
+        newdata=c(list(g1.con=g1),list(g2.con=g2),
+                  list(g3.con=g3),list(g4.con=g4)))
+tsls1.con.all = glm(y.bin~predict.con, family=binomial) #Logistic regression
+summary(tsls1.con.all)$coef[2]
+```
+The interpretation goes as follows:
+The estimate represents the change in log causal odds ratio of `ybin` per one unit increase in `x`. Specifically, each one unit increase in the exposure causally associates with `r round(exp(summary(tsls1.con.all)$coef[2]), 2)` higher odds of the outcome.   
+
+Using a normal approximation (estimate $\pm 1.96\times$standard error), a 95% confidence interval for the log causal odds ratio is (`r round(summary(tsls1.con.all)$coef[2] - 1.96*summary(tsls1.con.all)$coef[2,2],3)`, `r round(summary(tsls1.con.all)$coef[2] + 1.96*summary(tsls1.con.all)$coef[2,2],3)`). Taking the exponential of these values, we can obtain the 95% confidence interval for the odds ratio: (`r round(exp(summary(tsls1.con.all)$coef[2] - 1.96*summary(tsls1.con.all)$coef[2,2]),3)`, `r round(exp(summary(tsls1.con.all)$coef[2] + 1.96*summary(tsls1.con.all)$coef[2,2]),3)`).
+
+```{r}
+detach(coursedata)
+rm(list=ls())
+```
