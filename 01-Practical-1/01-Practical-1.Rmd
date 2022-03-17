@@ -222,7 +222,7 @@ Print results:
 summary(tsls1.con)$coef[2]
 summary(tsls1.con)$coef[2,2]
 ```
-c) Then repeat _b)_ byt for all genetic variants.
+c) Then repeat _b)_ but for all genetic variants.
 ```{r}
 g2.con = g2[y.bin ==0] #values for g2 in the controls only 
 g3.con = g3[y.bin ==0] #values for g3 in the controls only 

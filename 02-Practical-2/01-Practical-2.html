@@ -11,9 +11,9 @@
 
 <meta name="author" content="Diego Aguilar-Ramirez" />
 
-<meta name="date" content="2022-03-15" />
+<meta name="date" content="2022-03-17" />
 
-<title>Practical 1</title>
+<title>Practical 2</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -2793,320 +2793,231 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Practical 1</h1>
+<h1 class="title toc-ignore">Practical 2</h1>
 <h4 class="author">Diego Aguilar-Ramirez</h4>
-<h4 class="date">2022-03-15</h4>
+<h4 class="date">2022-03-17</h4>
 
 </div>
 
 
 <p><strong>NOTE:</strong>This script is largely based on material
-provided (see “00_Prelim_material” and “01_Practical-1”) by course to
-set up R for MR analyses used in course.</p>
-<div id="update-r" class="section level1">
-<h1>Update R</h1>
-<pre class="r"><code>if (!require(&quot;installr&quot;)) install.packages(&quot;installr&quot;)
-installr::updater()</code></pre>
-</div>
-<div id="install-packages-required-for-course-all-throughout" class="section level1">
-<h1>Install packages required for course all throughout</h1>
+provided (“01_Practical-2”)</p>
+<div id="install-and-load-libraries" class="section level1">
+<h1>Install and load libraries</h1>
 <pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;)
-pacman::p_load(ivpack, meta, MendelianRandomization)</code></pre>
+pacman::p_load(ivpack, meta, MendelianRandomization)
+library(ivpack)
+library(meta)
+library(MendelianRandomization)</code></pre>
 </div>
-<div id="load-the-data" class="section level1">
-<h1>Load the data</h1>
-<p>Data was downloaded from Moodle<br />
-<strong>NOTE:</strong> Rproj is at different wd (which is in version
-control). This Rmd file has a ROOTDIR set as a param from which data is
-called.</p>
+<div id="recap-from-practical-1" class="section level1">
+<h1>Recap from practical 1</h1>
+<p>In the first practical, the genetic associations with the risk factor
+<code>x</code> and with the continuous outcome <code>y</code> was
+estimated for each genetic variant in turn. This will be used in this
+practical. The same associations and standard errors (i.e. summarised
+data) are made available by large consortia.</p>
+<p><strong>NOTE:</strong> Data was downloaded from Moodle. Rproj is at
+different wd (which is in version control). This Rmd file has a ROOTDIR
+set as a param from which data is called.</p>
 <pre class="r"><code>coursedata = read.csv(ROOTDIR %&amp;% &quot;coursedata.csv&quot;) #Load data
-attach(coursedata) #Attach coursedata to the R search path </code></pre>
-<p><strong>NOTE:</strong> <code>attach(coursedata)</code> seems to be
-very useful to shorten scripts in R calling columns within
-<code>coursedata</code>. Instead of having to use
-<code>coursedata$g1</code> one simply has to use <code>g1</code> to call
-that column.</p>
+attach(coursedata) #Attach coursedata to the R search path 
+ratio.all&lt;-read.csv(ROOTDIR %&amp;% &quot;summarized_data.csv&quot;, row=1)
+bx=ratio.all[&quot;bx&quot;,]
+by=ratio.all[&quot;by&quot;,]
+bxse=ratio.all[&quot;bxse&quot;,]
+byse=ratio.all[&quot;byse&quot;,]</code></pre>
 </div>
-<div id="explore-the-data" class="section level1">
-<h1>Explore the data</h1>
-<pre class="r"><code>str(coursedata)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    1000 obs. of  8 variables:
-##  $ ID   : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ g1   : int  1 0 1 0 0 2 1 1 1 2 ...
-##  $ g2   : int  0 0 1 0 0 0 0 0 0 0 ...
-##  $ g3   : int  0 0 0 0 0 0 0 0 0 0 ...
-##  $ g4   : int  1 0 1 0 1 0 0 0 0 0 ...
-##  $ x    : num  0.5114 -1.0545 -0.563 0.8615 0.0156 ...
-##  $ y    : num  -1.297 0.912 1.279 -1.438 2.719 ...
-##  $ y.bin: int  1 0 0 1 0 0 1 1 0 0 ...</code></pre>
-<pre class="r"><code>head(coursedata)</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["ID"],"name":[1],"type":["int"],"align":["right"]},{"label":["g1"],"name":[2],"type":["int"],"align":["right"]},{"label":["g2"],"name":[3],"type":["int"],"align":["right"]},{"label":["g3"],"name":[4],"type":["int"],"align":["right"]},{"label":["g4"],"name":[5],"type":["int"],"align":["right"]},{"label":["x"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["y.bin"],"name":[8],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"1","3":"0","4":"0","5":"1","6":"0.51141400","7":"-1.2970720","8":"1","_rn_":"1"},{"1":"2","2":"0","3":"0","4":"0","5":"0","6":"-1.05450500","7":"0.9117613","8":"0","_rn_":"2"},{"1":"3","2":"1","3":"1","4":"0","5":"1","6":"-0.56296820","7":"1.2791060","8":"0","_rn_":"3"},{"1":"4","2":"0","3":"0","4":"0","5":"0","6":"0.86149410","7":"-1.4378610","8":"1","_rn_":"4"},{"1":"5","2":"0","3":"0","4":"0","5":"1","6":"0.01561589","7":"2.7192830","8":"0","_rn_":"5"},{"1":"6","2":"2","3":"0","4":"0","5":"0","6":"0.68330030","7":"1.6415770","8":"0","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-<div id="causal-estimate-using-the-ratio-method-for-a-continuous-outcome" class="section level1">
-<h1>1. Causal estimate using the ratio method for a continuous
-outcome</h1>
-<ol style="list-style-type: lower-alpha">
-<li>The causal effect of the risk factor <code>x</code> on the
-continuous outcome <code>y</code>can be estimated as the per allele
-genetic association with the outcome <span class="math inline">\(\hat{\beta}_{Y_{j}}\)</span> divided by the per
-allele genetic association with the risk factor <span class="math inline">\(\hat{\beta}_{X_{j}}\)</span> (the ratio method):
-<span class="math display">\[ratio\ estimate\ for\ variant\ j =
-\frac{\hat{\beta}_{Y_{j}}}{\hat{\beta}_{X_{j}}}\]</span> </li>
-</ol>
-<pre class="r"><code>by1 = lm(y~g1)$coef[2] #Genetic association with the outcome
-bx1 = lm(x~g1)$coef[2] #Genetic association with the exposure</code></pre>
-<p>So, simply divide <code>by1</code> by <code>bx1</code> to calculate
-the ratio</p>
-<pre class="r"><code>beta.ratio = by1/bx1
-beta.ratio #Ratio estimate for g1</code></pre>
-<pre><code>##          g1 
-## -0.06302634</code></pre>
+<div id="two-stage-least-squares-and-inverse-variance-weighted-estimates" class="section level1">
+<h1>1. Two-stage least squares and inverse-variance weighted
+estimates</h1>
+<p>Summarised data (the genetic associations with the risk factor and
+with the outcome with their standard errors) can be used to estimate the
+causal effect of the risk factor on the outcome via the IVW method:
+<span class="math display">\[IVW\ estimate\  =  {\frac{\sum_{j}
+\hat{\beta}_{Y_{j}} \hat{\beta}_{X_{j}} se( \hat{\beta}_{Y_{j}})^{-2}}
+{{\sum_{j}{\hat{\beta}^{2}_{X_{j}}}se({\hat{\beta}_{Y_{j}}})^{-2}}}}
+\]</span></p>
+<p>The standard error of the IVW estimate is:</p>
+<p><span class="math display">\[standard\ error\ of\ IVW\ estimate\ =
+\sqrt{\frac{1}{\sum_{j}{\hat{\beta^{2}_{X_{j}}}se(\hat\beta_{Y_j})^{-2}}}}  \]</span>
+a) Use the formula above to calculate the IVW estimate and the standard
+error</p>
+<pre class="r"><code>beta.ivw = sum(bx*by*byse^-2)/sum(bx^2*byse^-2)
+beta.ivw #IVW estimate </code></pre>
+<pre><code>## [1] 0.567561</code></pre>
+<pre class="r"><code>se.ivw   = 1/sqrt(sum(bx^2*byse^-2))
+se.ivw #standard error of the IVW estimate </code></pre>
+<pre><code>## [1] 0.2060492</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
-<li>The standard error of the causal estimate can be calculated simply
-as the standard error of the genetic association with the outcome <span class="math inline">\(se(\hat{\beta}_{Y_{j}})\)</span> divided by the
-genetic association with the risk factor <span class="math inline">\(\hat{\beta}_{X_{j}}\)</span>. This is the simplest
-form of the standard error, and is the first-order term from a delta
-method expansion for the standard error of a ratio (whatever this means,
-took verbatim from practical material). <span class="math display">\[standard\ error\ of\ ratio\ estimate\ (first\
-order) = \frac{se(\hat{\beta}_{Y_{j}})}{\hat{\beta}_{X_{j}}}\]</span>
-</li>
+<li>How does the IVW estimate compare with the estimate (0.571) and
+standard error (0.229) from the two-stage least squares method using all
+of the genetic variants from the first practical?</li>
 </ol>
-<p>Practical asks to <em>“calculate the first order standard error of
-the ratio estimate for the first genetic variant
-<tt><code>g1</code></tt>.”</em> This code should help:</p>
-<pre class="r"><code>byse1 = summary(lm(y~g1))$coef[2,2] #Standard error of the G-Y association
-se.ratio1first = byse1/sqrt(bx1^2)  
-se.ratio1first #Standard error (first order) of the ratio estimate </code></pre>
-<pre><code>##        g1 
-## 0.6451987</code></pre>
-<p><em>Since the estimate of <code>bx1</code> is not guaranteed to be
-positive, we take the square, and then the square root of
-<code>bx1</code>, when calculating the first order standard error of the
-ratio estimate. The standard error will not make sense if
-<code>bx1</code> is negative.</em></p>
+<p>The estimate from the 2SLS method was 0.570785 with a standard error
+of 0.2291837, which is very similar to the estimates from the IVW
+approach.</p>
+</div>
+<div id="motivation-for-the-inverse-variance-weighted-formula" class="section level1">
+<h1>2. Motivation for the inverse-variance weighted formula</h1>
+<p>In this section, three different methods which motivate the IVW
+formula defined above are provided.</p>
+<ol style="list-style-type: lower-alpha">
+<li>First, the IVW method can be motivated by the meta-analysis of the
+ratio estimates from the individual variants, using the first-order
+standard errors. Calculate the ratio estimates and first-order standard
+errors for the four genetic variants:</li>
+</ol>
+<pre class="r"><code>beta.ratio.all =  t(by/bx) #t() function is transpose
+se.ratio.all = t(byse/bx)</code></pre>
+<p>Now perform an IVW meta-analysis using the <code>metagen</code>
+command from the <code>meta</code> package:</p>
+<pre class="r"><code>metagen(beta.ratio.all, se.ratio.all)</code></pre>
+<pre><code>## Number of studies combined: k = 4
+## 
+##                                       95%-CI    z p-value
+## Common effect model  0.5676 [0.1637; 0.9714] 2.75  0.0059
+## Random effects model 0.5676 [0.1637; 0.9714] 2.75  0.0059
+## 
+## Quantifying heterogeneity:
+##  tau^2 &lt; 0.0001 [0.0000; 14.8943]; tau = 0.0008 [0.0000; 3.8593]
+##  I^2 = 0.0% [0.0%; 84.7%]; H = 1.00 [1.00; 2.56]
+## 
+## Test of heterogeneity:
+##     Q d.f. p-value
+##  2.47    3  0.4802
+## 
+## Details on meta-analytical method:
+## - Inverse variance method
+## - Restricted maximum-likelihood estimator for tau^2
+## - Q-profile method for confidence interval of tau^2 and tau</code></pre>
+<pre class="r"><code>metagen(beta.ratio.all, se.ratio.all)$TE.fixed</code></pre>
+<pre><code>## [1] 0.567561</code></pre>
+<pre class="r"><code>metagen(beta.ratio.all, se.ratio.all)$seTE.fixed</code></pre>
+<pre><code>## [1] 0.2060492</code></pre>
+<p>The fixed-effect estimate (0.567561) and standard error (0.2060492)
+using the <code>metagen</code> command is identical to the IVW estimate
+(0.567561) and standard error (0.2060492`). A fixed-effect analysis may
+not be appropriate if there is heterogeneity between the causal
+estimates.</p>
+<p>b). Secondly, the IVW method can also be motivated as a ratio
+estimate using a weighted allele score as an instrumental variable. We
+use the estimated genetic associations with the risk factor to create an
+allele score:</p>
+<pre class="r"><code>score &lt;- g1*as.numeric(bx[1]) + g2*as.numeric(bx[2]) + g3*as.numeric(bx[3]) + g4*as.numeric(bx[4])</code></pre>
+<p>Calculate the ratio estimate and its standard error (first-order)
+using this score as an instrumental variable and answer the following
+questions:</p>
+<p>How do these results compare to those above?</p>
+<pre class="r"><code>ivmodel.score = ivreg(y~x|score, x=TRUE)
+summary(ivmodel.score)</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = y ~ x | score, x = TRUE)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -6.2324383 -1.3661564 -0.0009812  1.4010821  7.1175494 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -0.06953    0.11435  -0.608   0.5433  
+## x            0.56732    0.22897   2.478   0.0134 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.031 on 998 degrees of freedom
+## Multiple R-Squared: -0.278,  Adjusted R-squared: -0.2792 
+## Wald test: 6.139 on 1 and 998 DF,  p-value: 0.01339</code></pre>
+<p><em>The results of the above model (estimate = 0.567, se = 0.229) are
+very similar to those from using the genetic variants as the
+instrument.</em></p>
+<p>How is the allele score similar to the fitted values of the risk
+factor in the two-stage least squares method?</p>
+<p><em>The difference between the allele score and the fitted values is
+approximately the intercept term from the regression of the risk factor
+on all the genetic variants.</em></p>
 <ol start="3" style="list-style-type: lower-alpha">
-<li>The above approximation does not account for the uncertainty in the
-denominator of the ratio estimate. This can be taken into account using
-the second term of the delta method expansion: <span class="math display">\[standard\ error\ of\ ratio\ estimate\ (second\
-order)
-=  \sqrt{\frac{se(\hat{\beta}_{Y_{j}})^2}{{\hat{\beta}_{X_{j}}}^2} +
-\frac{{\hat{\beta}_{Y_{j}}}^2{se(\hat{\beta}_{X_{j}})}^2}{{\hat{\beta}_{X_{j}}}^4}}
-\]</span> Calculate the second order standard error of the ratio
-estimate for the first genetic variant <tt><code>g1</code></tt>. </li>
+<li>Thirdly, it is motivated by the weighted linear regression of the
+genetic association estimates, with the intercept set to zero. Use the
+following code to fit the weighted linear regression model and obtain
+the causal estimate:</li>
 </ol>
-<pre class="r"><code>bxse1 = summary(lm(x~g1))$coef[2,2] #Standard error of the G-X association
-se.ratio1second = sqrt(byse1^2/bx1^2 + by1^2*bxse1^2/bx1^4)
-se.ratio1second #Standard error (second order) of the ratio estimate</code></pre>
-<pre><code>##        g1 
-## 0.6459625</code></pre>
-<ol start="4" style="list-style-type: lower-alpha">
-<li>The F-statistic from the regression of the risk factor on the
-genetic variant(s) is used as a measure of ‘weak instrument bias’, with
-smaller values suggesting that the estimate may suffer from weak
-instrument bias. Calculate the F-statistic for the first genetic variant
-<code>g1</code>.</li>
-</ol>
-<pre class="r"><code>fstat1 = summary(lm(x~g1))$f[1]
-fstat1</code></pre>
-<pre><code>##    value 
-## 4.027979</code></pre>
-<p><strong>NOTE:</strong><em>Care should be taken when interpreting the
-F-statistic from observed data. Some studies recommend excluding genetic
-variants if they have a F-statistic less than 10. Using such a stringent
-cut-off may introduce more bias than it prevents, as the estimated
-F-statistic can show considerable variation and may not provide a good
-indication of the true stength of the instrument.</em></p>
-<ol start="5" style="list-style-type: lower-alpha">
-<li>The Minor Allele Frequency (MAF) is the frequency at which the
-second most common allele occurs in a given population. Calculate the
-MAF for <code>g1</code>, remembering that some people may have 2 copies
-of the allele. <em>“Total up the total number of alleles in the
-population and divide by two times the size of the population”</em></li>
-</ol>
-<pre class="r"><code>MAF = (sum(g1==1) + 2*sum(g1==2))/(2*length(g1))
-MAF</code></pre>
-<pre><code>## [1] 0.3015</code></pre>
-<ol start="6" style="list-style-type: lower-alpha">
-<li>How does <code>g1</code> compare with the other genetic variants?
-Read in <code>summarized_data.csv</code> to obtain the values that have
-been calculated (for the course) for the other 3 genetic variants.</li>
-</ol>
-<pre class="r"><code>ratio.all&lt;-as.matrix(read.csv(ROOTDIR %&amp;% &quot;summarized_data.csv&quot;, row=1)) 
-ratio.all</code></pre>
-<pre><code>##                           g1         g2         g3         g4
-## by              -0.008550605  0.2565551  0.2778433 0.17188563
-## byse             0.087532274  0.1325076  0.1316129 0.12653807
-## bx               0.135667161  0.4938326  0.3475786 0.06788043
-## bxse             0.067597577  0.1015321  0.1014761 0.09798360
-## beta.ratio      -0.063026340  0.5195184  0.7993682 2.53218242
-## se.ratio.first   0.645198685  0.2683249  0.3786566 1.86413185
-## se.ratio.second  0.645962479  0.2888032  0.4447983 4.10305056
-## fstat            4.027979155 23.6566409 11.7321775 0.47993491
-## MAF              0.301500000  0.1010000  0.1030000 0.11150000</code></pre>
-<p><em>For the first order approximation, the most precise genetic
-variant (ie, that with the smallest standard error) is <code>g2</code>.
-Variants with stronger associations with the risk factor will have
-smaller standard errors for the ratio estimate. Variants with low MAF
-will generally have large standard errors for the ratio
-estimate.</em></p>
-<p><em>There is little difference in the standard errors for the first
-and second order approximations for <code>g1</code> and <code>g2</code>.
-The second order approximations are noticeably larger than the first
-order approximations for <code>g3</code> and <code>g4</code>. The first
-and second order standard errors differ the most when the genetic
-association with the risk factor is imprecise.</em></p>
-<p>To compute the <strong>observational</strong> association, regress
-<code>y</code> on <code>x</code>.</p>
-<pre class="r"><code>lm(y~x)$coeff[2]</code></pre>
-<pre><code>##          x 
-## -0.1254655</code></pre>
-<p><em>The estimate for the observational association suggests there is
-an negative effect of the risk factor on the outcome. However the ratio
-estimates for <tt><code>g2</code></tt>, <tt><code>g3</code></tt> and
-<tt><code>g4</code></tt> indicated a positive effect.</em></p>
-<div id="section" class="section level3">
-<h3></h3>
-</div>
-</div>
-<div id="causal-estimate-using-the-two-stage-least-squares-method-for-a-continuous-outcome" class="section level1">
-<h1>2. Causal estimate using the two-stage least squares method for a
-continuous outcome</h1>
-<p>The causal effect of the risk factor <code>x</code> on the continuous
-outcome <code>y</code> can also be estimated by the two-stage least
-squares (2SLS or TSLS) method. Two-stage least squares is performed by:
-- Regressing the risk factor on all the genetic variants in the same
-model and storing the fitted values of the risk factor (R code:
-<code>fitted.values=lm(x~g1+g2+g3+g4)$fitted</code>). - A regression is
-then performed with the outcome on the fitted values of the risk factor
-(R code: <code>lm(y~fitted.values)</code>)</p>
-<ol style="list-style-type: lower-alpha">
-<li>Perform the two-stage least squares method “by hand” (doing the
-regression stages yourself). Note the estimate and se of the second
-regression.</li>
-</ol>
-<pre class="r"><code>fitted.values=lm(x~g1+g2+g3+g4)$fitted
-by.hand&lt;-lm(y~fitted.values)</code></pre>
-<pre class="r"><code>summary(by.hand)$coeff[2] #estimate</code></pre>
-<pre><code>## [1] 0.570785</code></pre>
-<pre class="r"><code>summary(by.hand)$coeff[2,2] #standard error</code></pre>
-<pre><code>## [1] 0.2016973</code></pre>
-<ol start="2" style="list-style-type: lower-alpha">
-<li>Performing two-stage least squares by hand is discouraged as SE in
-2nd stage of regression does not account for uncertainty in 1st stage
-regression. The R package performs the 2SLS method using the
-<code>ivreg</code> function:</li>
-</ol>
-<pre class="r"><code>ivmodel.all = ivreg(y~x|g1+g2+g3+g4, x=TRUE)</code></pre>
-<pre class="r"><code>summary(ivmodel.all)$coeff[2] #estimate</code></pre>
-<pre><code>## [1] 0.570785</code></pre>
-<pre class="r"><code>summary(ivmodel.all)$coeff[2,2] #standard error</code></pre>
-<pre><code>## [1] 0.2291837</code></pre>
-<p><em>Estimates are the same, but standard error is slightly larger
-when using <code>ivreg</code> function, as it takes into account the
-uncertainty in 1st-stage regression</em></p>
-<ol start="3" style="list-style-type: lower-alpha">
-<li>What is the F statistic for the model with all the genetic
-variants?</li>
-</ol>
-<pre class="r"><code>summary(lm(x~g1+g2+g3+g4))$f[1] #f-stat</code></pre>
-<pre><code>##   value 
-## 10.5824</code></pre>
-<ol start="4" style="list-style-type: lower-alpha">
-<li>Perform the 2SLS method based only on the first genetic variant
-<code>g1</code></li>
-</ol>
-<pre class="r"><code>ivmodel.g1 = ivreg(y~x|g1, x=TRUE)
-summary(ivmodel.g1)$coef[2] #2SLS estimate for g1 only </code></pre>
-<pre><code>## [1] -0.06302634</code></pre>
-<pre class="r"><code>summary(ivmodel.g1)$coef[2,2] #Standard error of the 2SLS estimate for g</code></pre>
-<pre><code>## [1] 0.64291</code></pre>
-<p><em>The estimates from the 2SLS method and the ratio method are the
-same and the standard errors from the two approaches are very
-similar.</em></p>
-<div id="section-1" class="section level3">
-<h3></h3>
-</div>
-</div>
-<div id="causal-estimate-for-a-binary-outcome" class="section level1">
-<h1>3. Causal estimate for a binary outcome</h1>
-<p>The causal effect of the risk factor <code>x</code> on the binary
-outcome <code>y.bin</code> can also be estimated as the per allele
-genetic association with the outcome divided by the per allele
-association with the risk factor. However, with a binary outcome,
-logistic regression should be used for regression of the outcome on the
-genetic variant, particularly in a case-control setting. Also, in a case
-control setting, it is usual to regress the risk factor on the genetic
-variant <em>in controls only</em>. The <code>glm</code> function with an
-extra argument of <code>family=binomial</code> can be used to perform
-logistic regression in the same way that <code>lm</code> is used to
-perform linear regression.</p>
-<ol style="list-style-type: lower-alpha">
-<li>Evaluate the ratio estimate and its SE for <code>g1</code> using
-logistic regression (R code:
-<code>glm(y.bin~g1, family=binomial)</code>) to calculate the numerator
-(gene-outcome association), and linear regression in controls only (R
-code: <code>lm(x[ybin==0]~g1[y.bin==0])</code>) to calculate the
-denominator.</li>
-</ol>
-<pre class="r"><code>by1.bin &lt;- glm(y.bin~g1, family=binomial)$coef[2] #numerator with log reg, ie gene-outcome association
-byse1.bin &lt;- summary(glm(y.bin~g1, family=binomial))$coef[2,2] #standard error</code></pre>
-<pre class="r"><code>bx1.bin &lt;- lm(x[y.bin==0]~g1[y.bin==0])$coef[2] #denominator with lin reg only in controls, ie gene exposure association
-beta.ratio1.bin &lt;- by1.bin/bx1.bin
-beta.ratio1.bin # ratio estimate for g1</code></pre>
-<pre><code>##        g1 
-## 0.2599639</code></pre>
-<pre class="r"><code>se.ratio1.bin &lt;- byse1.bin/sqrt(bx1.bin^2) #standard error of the ratio estimate for g1 (changed script form course material to square and then sqrt)
-se.ratio1.bin</code></pre>
-<pre><code>## g1[y.bin == 0] 
-##      0.5921551</code></pre>
-<ol start="2" style="list-style-type: lower-alpha">
-<li>Calculate the 2SLS estimate for <code>g1</code> only. Recall we
-first regress the risk factor on the genetic variant - however in the
-binary case, we want to perform this regression on the controls only.
-Then find fitted values for the model. Cases will still need a fitted
-value of the risk factor - this van be obtained by either using the
-<code>predict</code> function or by using the coefficients estimated in
-the first stage and calculating fitted values manually. Finally, we
-regress the binary outcome on thes fitted values using logistic
-regression.</li>
-</ol>
-<pre class="r"><code>g1.con = g1[y.bin==0] #values for g1 in the controls only 
-x.con  = x[y.bin==0] #values for the risk factor in the controls only
+<pre class="r"><code>BY&lt;-t(by) # rotates data to a column vector
+BX&lt;-t(bx)
+BYSE&lt;-t(byse)
+BXSE&lt;-t(bxse)
 
-#Generate predicted values for all participants based on the linear regression in the controls only.
-predict.con.g1 = predict(lm(x.con~g1.con), newdata=list(g1.con=g1)) 
-
-#Fit a logistic regression model on all the participants
-tsls1.con = glm(y.bin~predict.con.g1, family=binomial)</code></pre>
-<p>Print results:</p>
-<pre class="r"><code>summary(tsls1.con)$coef[2]</code></pre>
-<pre><code>## [1] 0.2599639</code></pre>
-<pre class="r"><code>summary(tsls1.con)$coef[2,2]</code></pre>
-<pre><code>## [1] 0.5921551</code></pre>
-<ol start="3" style="list-style-type: lower-alpha">
-<li>Then repeat <em>b)</em> but for all genetic variants.</li>
+regression&lt;- lm(BY~BX-1, weights = BYSE^-2)
+summary(regression) </code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = BY ~ BX - 1, weights = BYSE^-2)
+## 
+## Weighted Residuals:
+##      g1      g2      g3      g4 
+## -0.9774 -0.1790  0.6122  1.0539 
+## 
+## Coefficients:
+##    Estimate Std. Error t value Pr(&gt;|t|)  
+## BX   0.5676     0.1871   3.034   0.0561 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9079 on 3 degrees of freedom
+## Multiple R-squared:  0.7542, Adjusted R-squared:  0.6723 
+## F-statistic: 9.205 on 1 and 3 DF,  p-value: 0.05613</code></pre>
+<pre class="r"><code>summary(regression)$coef[1]   </code></pre>
+<pre><code>## [1] 0.567561</code></pre>
+<pre class="r"><code>summary(regression)$coef[1,2]/summary(regression)$sigma </code></pre>
+<pre><code>## [1] 0.2060492</code></pre>
+<p>The results from the weighted linear regression model are the same as
+those reported in parts a). and b).</p>
+<p><strong>NOTE:</strong> We want to avoid under underdispersion (the
+estimate being more precise than from a fixed-effect meta-analysis). If
+<strong>sigma</strong>, which is the standard deviation of the
+variant-specific estimates, <strong>is less than 1</strong>, then the
+dispersion of the estimates is lower than one would expect due to chance
+alone (based on the precision of the estimates). However if sigma had
+been &gt;1, then the variant-specific estimates are more heterogeneous
+than one would expect due to chance alone based on the precision of the
+estimates. We want to allow for over dispersion to make confidence
+intervals wider, but but not allow underdispersion to make the
+confidence intervals narrower. So standard error of the causal estimate
+is divided by sigma (estimate of the residual standard error) to force
+the residual standard error to be at least one.</p>
+</div>
+<div id="visual-representation-of-data" class="section level1">
+<h1>3. Visual representation of data</h1>
+<ol style="list-style-type: lower-alpha">
+<li>Use the code below to draw a scatter plot of the genetic
+associations with the risk factor and with the outcome:</li>
 </ol>
-<pre class="r"><code>g2.con = g2[y.bin ==0] #values for g2 in the controls only 
-g3.con = g3[y.bin ==0] #values for g3 in the controls only 
-g4.con = g4[y.bin ==0] #values for g4 in the controls only 
-predict.con&lt;-predict(lm(x.con~g1.con+g2.con+g3.con+g4.con), #Predicted values 
-        newdata=c(list(g1.con=g1),list(g2.con=g2),
-                  list(g3.con=g3),list(g4.con=g4)))
-tsls1.con.all = glm(y.bin~predict.con, family=binomial) #Logistic regression
-summary(tsls1.con.all)$coef[2]</code></pre>
-<pre><code>## [1] 0.9410501</code></pre>
-<p>The interpretation goes as follows: The estimate represents the
-change in log causal odds ratio of <code>ybin</code> per one unit
-increase in <code>x</code>. Specifically, each one unit increase in the
-exposure causally associates with 2.56 higher odds of the outcome.</p>
-<p>Using a normal approximation (estimate <span class="math inline">\(\pm 1.96\times\)</span>standard error), a 95%
-confidence interval for the log causal odds ratio is (0.205, 1.677).
-Taking the exponential of these values, we can obtain the 95% confidence
-interval for the odds ratio: (1.228, 5.348).</p>
+<pre class="r"><code>plot(BX, BY, xlim=c(min(BX-2*BXSE, 0), max(BX+2*BXSE, 0)),
+  ylim=c(min(BY-2*BYSE, 0), max(BY+2*BYSE, 0)), col=&quot;blue&quot;, asp = 1)
+for (j in 1:length(BX)) {
+ lines(c(BX[j],BX[j]), c(BY[j]-1.96*BYSE[j], BY[j]+1.96*BYSE[j]))
+ lines(c(BX[j]-1.96*BXSE[j],BX[j]+1.96*BXSE[j]), c(BY[j], BY[j]))
+          }
+abline(h=0, lwd=1, col=&quot;grey&quot;)
+abline(v=0, lwd=1, col=&quot;grey&quot;)
+abline(a=0, b=sum(bx*by*byse^-2)/sum(bx^2*byse^-2), col=&quot;red&quot;)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<ul>
+<li>The lines represent the 95% confidence intervals for the genetic
+associations with the exposure and with the outcome.</li>
+<li>The ratio estimate for each variant is the gradient of the line from
+the origin to the data point.</li>
+<li>There is a good range in the strength of the genetic associations
+with the risk factor, and the data points lie close to the IVW estimate
+(red line in the scatter plot). There also appears to be a dose-response
+relationship between the genetic associations with the risk factor and
+with the outcome.</li>
+<li>There appears to be little heterogeneity in the ratio
+estimates.</li>
+<li>Pleiotropic variants may appear as outliers on the scatter
+plot.</li>
+</ul>
 <pre class="r"><code>detach(coursedata)
 rm(list=ls())</code></pre>
 </div>
